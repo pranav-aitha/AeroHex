@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    =============================================================================
+    AeroHex // Client-Side Memory Segment Analysis & Binary Forensic Engine
+    =============================================================================
+    Architectural Guidelines & Repository Realization Directive:
+    - Primary Repository Target: https://github.com/pranav-aitha/AeroHex
+    - Project Designation: AeroHex (Serverless Zero-Trust Client-Side Binary Splicer)
+    - Live Static Hosting Sandbox: https://github.io (GitHub Pages distribution target)
+    - Operational Topology: Fully browser-sandboxed HTML5 FileReader API execution.
+      Zero external network telemetry, zero server-side binary serialization,
+      air-gapped memory-resident array parsing.
+    =============================================================================
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="AeroHex is a serverless client-side binary segment parser and metadata extractor operating purely within the browser sandbox.">
+  <meta name="theme-color" content="#0B0A10">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50 5, 90 27.5, 90 72.5, 50 95, 10 72.5, 10 27.5' fill='%230B0A10' stroke='%232FD3F2' stroke-width='6'/><circle cx='50' cy='50' r='14' fill='%23F22F2F'/></svg>">
+  <title>AEROHEX // Client-Side Memory Segment Analysis &amp; Binary Forensic Engine</title>
+
+  <!-- Typography: JetBrains Mono and Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Core Architectural Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="aerohex-app">
+
+  <!-- Background Layer: WebGL2 Ribbon Glow Engine & Fixed Decompiled Assembly Matrix -->
+  <canvas id="ribbon-glow-canvas" class="ribbon-glow-canvas" aria-hidden="true"></canvas>
+
+  <div id="code-backdrop" class="code-backdrop-matrix" aria-hidden="true">
+    <div class="matrix-column" data-speed="1.1"></div>
+    <div class="matrix-column" data-speed="0.8"></div>
+    <div class="matrix-column" data-speed="1.4"></div>
+    <div class="matrix-column" data-speed="0.9"></div>
+    <div class="matrix-column" data-speed="1.2"></div>
+  </div>
+
+  <div class="radial-grid-overlay" aria-hidden="true"></div>
+
+  <!-- Primary Application Container -->
+  <main class="core-container">
+
+    <!-- Top Utility Controls -->
+    <div class="top-nav-bar">
+      <div class="airgap-shield-indicator">
+        <span class="shield-dot"></span>
+        <span class="shield-text">AIRGAP ACTIVE // 0 PACKETS TRANSMITTED</span>
+      </div>
+      <div class="nav-actions">
+        <button id="sound-toggle-btn" class="cyber-btn-subtle" type="button" title="Toggle Synthesized Audio Feedback">
+          <span class="btn-icon">🔊</span> AUDIO: <span id="sound-state-label">ON</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero Header Component -->
+    <header class="hero-header">
+      <div class="security-tag-container" id="security-tag">
+        <span class="security-pulse-indicator"></span>
+        <span class="security-tag-label">// LOCAL_SANDBOX_ENFORCED</span>
+      </div>
+
+      <h1 class="brand-title">AEROHEX<span class="brand-dot">.</span></h1>
+      <p class="hero-subtitle">Client-Side Memory Segment Analysis &amp; Binary Forensic Engine</p>
+    </header>
+
+    <!-- Interactive Drag-and-Drop Workspace Panel -->
+    <section class="workspace-section">
+      <div id="drop-node" class="drop-node" role="region" aria-label="Forensic File Ingestion Zone" tabindex="0">
+        <input 
+          type="file" 
+          id="file-ingest" 
+          class="file-ingest-control" 
+          accept="image/jpeg,application/pdf" 
+          aria-hidden="true"
+        >
+
+        <div class="drop-node-ambient-glow" aria-hidden="true"></div>
+        <div class="drop-corner drop-corner-tl" aria-hidden="true"></div>
+        <div class="drop-corner drop-corner-tr" aria-hidden="true"></div>
+        <div class="drop-corner drop-corner-bl" aria-hidden="true"></div>
+        <div class="drop-corner drop-corner-br" aria-hidden="true"></div>
+
+        <div class="prompt-area">
+          <div class="pulse-ring" aria-hidden="true">
+            <div class="pulse-ring-core"></div>
+            <div class="pulse-ring-outer"></div>
+          </div>
+
+          <div class="prompt-text-group">
+            <h2 class="prompt-headline">Ingest Forensic Target File</h2>
+            <p class="prompt-instruction">Drop JPEG / PDF or Click to Map Directory Context</p>
+          </div>
+
+          <div class="supported-formats-strip">
+            <span class="format-pill">MAGIC: 0xFFD8 [JPEG]</span>
+            <span class="format-pill">MAGIC: 0x2550 [PDF]</span>
+            <span class="format-pill">AIRGAP: 100% CLIENT</span>
+          </div>
+
+          <!-- Quick Test Targets for Instant Demonstration -->
+          <div class="quick-samples-bar" onclick="event.stopPropagation()">
+            <span class="samples-title">// TEST VECTOR GENERATORS:</span>
+            <button type="button" id="load-sample-jpeg" class="sample-preset-btn">DEMO JPEG [EXIF/JFIF]</button>
+            <button type="button" id="load-sample-pdf" class="sample-preset-btn">DEMO PDF [OBJECT STREAM]</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Split Diagnostic Viewport Layout (Defaulted to Hidden) -->
+    <section id="analysis-viewport" class="analysis-viewport" style="display: none;">
+      <div class="viewport-header-strip">
+        <div class="file-summary-badge" id="telemetry-filename">TARGET: UNLOADED</div>
+        <div class="file-summary-meta">
+          <span id="telemetry-size">0 BYTES</span>
+          <span class="meta-separator">//</span>
+          <span id="telemetry-hash">SHA-256: CALCULATING...</span>
+        </div>
+        <div class="viewport-controls-row">
+          <button id="export-json-btn" class="session-btn-action session-btn-export" type="button" title="Download Forensic Telemetry JSON">
+            EXPORT JSON
+          </button>
+          <button id="copy-hex-btn" class="session-btn-action session-btn-copy" type="button" title="Copy Raw Hex View to Clipboard">
+            COPY HEX
+          </button>
+          <button id="reset-session-btn" class="session-action-btn" type="button">
+            RELEASE MEMORY BUFFER [ESC]
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Byte Inspector Card -->
+      <div class="byte-inspector-bar" id="byte-inspector">
+        <span class="inspector-indicator">INSPECTOR</span>
+        <span class="inspector-field">OFFSET: <strong id="inspect-offset">0x00000000</strong></span>
+        <span class="inspector-field">HEX: <strong id="inspect-hex">0x00</strong></span>
+        <span class="inspector-field">DEC: <strong id="inspect-dec">0</strong></span>
+        <span class="inspector-field">BIN: <strong id="inspect-bin">00000000</strong></span>
+        <span class="inspector-field">ASCII: <strong id="inspect-ascii">NUL</strong></span>
+        <span class="inspector-segment" id="inspect-desc">Hover over any byte in the splicer below</span>
+      </div>
+
+      <div class="viewport-split-grid">
+        <!-- Left Column Pane: Binary Header Splicer -->
+        <article class="pane-card pane-left">
+          <div class="pane-card-header">
+            <span class="terminal-decorator-icon"></span>
+            <h3 class="pane-title">[0x00] BINARY HEADER SPLICER</h3>
+            <span class="pane-offset-counter" id="stream-byte-count">OFFSET: 0x0000 - 0x0600</span>
+          </div>
+          <div class="pane-card-body code-screen">
+            <pre class="stream-wrapper"><code id="hex-stream" class="hex-stream-content">/* Awaiting memory buffer instantiation... */</code></pre>
+          </div>
+        </article>
+
+        <!-- Right Column Pane: Extracted Telemetry Registers -->
+        <article class="pane-card pane-right">
+          <div class="pane-card-header">
+            <span class="terminal-decorator-icon"></span>
+            <h3 class="pane-title">[0x01] EXTRACTED TELEMETRY REGISTERS</h3>
+            <span class="pane-status-pill" id="entropy-pill">ENTROPY: 0.000</span>
+          </div>
+          <div class="pane-card-body ledger-screen">
+            <!-- Entropy Visualization Gauge -->
+            <div class="entropy-gauge-container">
+              <div class="entropy-gauge-labels">
+                <span class="gauge-title">SHANNON ENTROPY DISTRIBUTION</span>
+                <span class="gauge-score" id="gauge-score-label">0.00 / 8.00 BITS</span>
+              </div>
+              <div class="entropy-bar-track">
+                <div class="entropy-bar-fill" id="entropy-bar-fill" style="width: 0%;"></div>
+              </div>
+              <div class="entropy-ticks">
+                <span>0.0 (RAW/SPARSE)</span>
+                <span>4.0 (TEXT/STRUCTURED)</span>
+                <span>8.0 (ENCRYPTED/COMPRESSED)</span>
+              </div>
+            </div>
+
+            <div id="metadata-ledger" class="metadata-ledger-grid">
+              <!-- Dynamically hydrated forensic telemetry cards -->
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Fixed Global Application Footer -->
+  <footer class="fixed-footer">
+    <div class="footer-meta">Mde WITH LOVE BY PRANAV AITHA</div>
+    <nav class="footer-social-row" aria-label="Social Profiles">
+      <a href="https://x.com" class="social-anchor" target="_blank" rel="noopener noreferrer">X // Twitter</a>
+      <a href="https://github.com/pranav-aitha" class="social-anchor" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://instagram.com" class="social-anchor" target="_blank" rel="noopener noreferrer">Instagram</a>
+    </nav>
+  </footer>
+
+  <!-- Base Application Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
